@@ -1,7 +1,24 @@
-package go_web3
+package main
 
-import "fmt"
+import (
+	"projectx/network"
+	"time"
+)
 
 func main() {
-	fmt.Println("hello,world")
+
+	trLocal := network.NewLocalTransport("local")
+	trRemote := network.NewLocalTransport("remote")
+
+	go func() {
+		for {
+			trRemote.SendMessage(trLocal.Addr(), []byte("hello"))
+			time.Sleep(1 * time.Second)
+		}
+	}()
+	opts := network.ServerOpts{
+		Transports: []network.Transport{trLocal},
+	}
+	server := network.NewServer(opts)
+	server.Start()
 }
